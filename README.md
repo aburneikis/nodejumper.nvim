@@ -20,7 +20,7 @@ A flash.nvim-like Neovim plugin for jumping to treesitter nodes. Press a key, se
 
 ```lua
 {
-  'your-username/nodejumper.nvim',
+  'burneikis/nodejumper.nvim',
   config = function()
     require('nodejumper').setup()
   end
@@ -31,7 +31,7 @@ A flash.nvim-like Neovim plugin for jumping to treesitter nodes. Press a key, se
 
 ```lua
 use {
-  'your-username/nodejumper.nvim',
+  'burneikis/nodejumper.nvim',
   config = function()
     require('nodejumper').setup()
   end
