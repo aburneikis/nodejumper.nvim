@@ -39,7 +39,7 @@ INSTALLATION                                      *nodejumper-installation*
 Using lazy.nvim:
 >lua
     {
-      'nodejumper.nvim',
+      'your-username/nodejumper.nvim',
       config = function()
         require('nodejumper').setup()
       end
@@ -49,7 +49,7 @@ Using lazy.nvim:
 Using packer.nvim:
 >lua
     use {
-      'nodejumper.nvim',
+      'your-username/nodejumper.nvim',
       config = function()
         require('nodejumper').setup()
       end
@@ -89,27 +89,33 @@ Default configuration:
       -- Labels used for jumping (home row first for accessibility)
       labels = "asdfghjklqwertyuiopzxcvbnm",
 
-      -- Highlight groups
-      highlight = {
-        label = "NodejumperLabel",  -- Jump target labels
-        dim = "NodejumperDim",      -- Dimmed background
-      },
+      -- Key to trigger jump mode
+      jump_key = "S",
 
-      -- Keymaps
-      keys = {
-        jump = "S",       -- Key to trigger jump
-        cancel = "<Esc>", -- Key to cancel
-      },
+      -- Whether to set the default keymap (set to false for custom mappings)
+      set_default_keymap = true,
 
-      -- Treesitter options
-      treesitter = {
-        all_nodes = false,    -- Include all nodes (even tiny ones)
-        min_node_size = 3,    -- Minimum node size in characters
-      },
+      -- Minimum node size to show labels (reduces clutter)
+      min_node_size = 3,
 
-      -- Label display options
-      label_opts = {
-        priority = 1000,  -- Extmark priority
+      -- Minimum spacing between labels on same line
+      min_spacing = 2,
+
+      -- Dim background text during jump mode
+      dim_background = true,
+
+      -- Include all nodes (even tiny ones) - expert mode
+      all_nodes = false,
+
+      -- Advanced options (rarely need to change)
+      advanced = {
+        cancel_key = "<Esc>",
+        min_word_length = 0,
+        priority = 1000,
+        highlight = {
+          label = "NodejumperLabel",
+          dim = "NodejumperDim",
+        },
       },
     }
 <
@@ -120,28 +126,49 @@ labels ~
     the beginning are used first (single-character labels), then combinations
     are generated for additional targets. Default uses home row keys first.
 
-                                                     *nodejumper-highlight*
-highlight.label ~
-    Highlight group for jump target labels. Default: "NodejumperLabel"
-
-highlight.dim ~
-    Highlight group for dimmed background text. Default: "NodejumperDim"
-
-                                                          *nodejumper-keys*
-keys.jump ~
+                                                      *nodejumper-jump_key*
+jump_key ~
     Key to trigger treesitter node jump. Default: "S"
 
-keys.cancel ~
-    Key to cancel an active jump session. Default: "<Esc>"
+                                             *nodejumper-set_default_keymap*
+set_default_keymap ~
+    Whether to set the default keymap. Set to false if you want to define
+    your own keymap. Default: true
 
-                                                    *nodejumper-treesitter*
-treesitter.all_nodes ~
-    When true, includes all treesitter nodes regardless of size.
+                                                 *nodejumper-min_node_size*
+min_node_size ~
+    Minimum node size in characters to show a label. Helps reduce clutter
+    by hiding very small nodes. Default: 3
+
+                                                   *nodejumper-min_spacing*
+min_spacing ~
+    Minimum spacing between labels on the same line. Prevents label clutter.
+    Default: 2
+
+                                                *nodejumper-dim_background*
+dim_background ~
+    Whether to dim the background text during jump mode. Default: true
+
+                                                    *nodejumper-all_nodes*
+all_nodes ~
+    When true, includes all treesitter nodes regardless of size (expert mode).
     When false, filters out very small nodes. Default: false
 
-treesitter.min_node_size ~
-    Minimum node size in characters to show a label (when all_nodes is false).
-    Default: 3
+                                                      *nodejumper-advanced*
+advanced.cancel_key ~
+    Key to cancel an active jump session. Default: "<Esc>"
+
+advanced.min_word_length ~
+    Minimum word length at label position. Default: 0
+
+advanced.priority ~
+    Extmark priority for labels. Default: 1000
+
+advanced.highlight.label ~
+    Highlight group for jump target labels. Default: "NodejumperLabel"
+
+advanced.highlight.dim ~
+    Highlight group for dimmed background text. Default: "NodejumperDim"
 
 ==============================================================================
 COMMANDS                                              *nodejumper-commands*

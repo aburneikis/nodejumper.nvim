@@ -133,8 +133,6 @@ function M.get_visible_nodes(bufnr)
           col = start_col,
           end_row = end_row,
           end_col = end_col,
-          node = node,
-          type = node:type(),
           size = node_size,
         })
       end

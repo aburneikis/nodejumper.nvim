@@ -11,21 +11,23 @@ local state = {
   win = nil,
   label_map = {},
   typed = "",
+  cancel_key = nil, -- Cached termcode for cancel key
 }
 
 --- Clean up after jump session
 local function cleanup()
-  if state.bufnr then
+  if state.bufnr and vim.api.nvim_buf_is_valid(state.bufnr) then
     labels.clear_labels(state.bufnr)
   end
 
-  state = {
-    active = false,
-    bufnr = nil,
-    win = nil,
-    label_map = {},
-    typed = "",
-  }
+  -- Clear fields instead of reassigning table to avoid race conditions
+  -- with any callbacks that might hold a reference to state
+  state.active = false
+  state.bufnr = nil
+  state.win = nil
+  state.label_map = {}
+  state.typed = ""
+  state.cancel_key = nil
 
   -- Force redraw to clear visual artifacts
   vim.cmd("redraw")
@@ -67,10 +69,8 @@ local function handle_char(char)
     return
   end
 
-  local opts = config.options
-
-  -- Check for cancel
-  if char == vim.api.nvim_replace_termcodes(opts.advanced.cancel_key, true, false, true) then
+  -- Check for cancel (using cached termcode)
+  if char == state.cancel_key then
     cleanup()
     return
   end
@@ -100,6 +100,10 @@ local function handle_char(char)
 end
 
 --- Input loop for collecting characters
+--- Note: This uses a synchronous loop with getcharstr(), which is the standard
+--- pattern for modal input in Neovim (used by flash.nvim, leap.nvim, etc.).
+--- While it blocks the event loop, this is intentional to capture all input
+--- during jump mode. Alternatives like vim.on_key() have their own trade-offs.
 local function input_loop()
   while state.active do
     -- Get a single character
@@ -126,14 +130,13 @@ function M.jump()
     return
   end
 
-  -- Initialize state
-  state = {
-    active = true,
-    bufnr = bufnr,
-    win = win,
-    label_map = {},
-    typed = "",
-  }
+  -- Initialize state (set fields individually to preserve table reference)
+  state.active = true
+  state.bufnr = bufnr
+  state.win = win
+  state.label_map = {}
+  state.typed = ""
+  state.cancel_key = vim.api.nvim_replace_termcodes(config.options.advanced.cancel_key, true, false, true)
 
   -- Display labels and get mapping (this clears existing extmarks first)
   state.label_map = labels.display_labels(bufnr, nodes)

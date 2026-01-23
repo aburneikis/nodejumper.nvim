@@ -89,6 +89,11 @@ end
 ---@param bufnr number Buffer number
 ---@param win number Window handle
 function M.dim_buffer(bufnr, win)
+  -- Validate buffer and window are still valid
+  if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_win_is_valid(win) then
+    return
+  end
+
   local opts = config.options
   local start_line = vim.fn.line("w0", win) - 1
   local end_line = vim.fn.line("w$", win)

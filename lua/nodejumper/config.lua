@@ -36,8 +36,49 @@ M.defaults = {
 
 M.options = vim.deepcopy(M.defaults)
 
+--- Validate configuration options
+---@param options table Configuration to validate
+---@return boolean valid
+---@return string|nil error_message
+local function validate_config(options)
+  -- Validate labels
+  if type(options.labels) ~= "string" or #options.labels == 0 then
+    return false, "labels must be a non-empty string"
+  end
+
+  -- Validate min_node_size
+  if type(options.min_node_size) ~= "number" or options.min_node_size < 0 then
+    return false, "min_node_size must be a non-negative number"
+  end
+
+  -- Validate min_spacing
+  if type(options.min_spacing) ~= "number" or options.min_spacing < 0 then
+    return false, "min_spacing must be a non-negative number"
+  end
+
+  -- Validate jump_key
+  if type(options.jump_key) ~= "string" or #options.jump_key == 0 then
+    return false, "jump_key must be a non-empty string"
+  end
+
+  -- Validate advanced.priority
+  if options.advanced and type(options.advanced.priority) ~= "number" then
+    return false, "advanced.priority must be a number"
+  end
+
+  return true, nil
+end
+
 function M.setup(opts)
   M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
+
+  -- Validate configuration
+  local valid, err = validate_config(M.options)
+  if not valid then
+    vim.notify("nodejumper: invalid config - " .. err, vim.log.levels.ERROR)
+    M.options = vim.deepcopy(M.defaults)
+    return
+  end
 
   -- Set up default highlight groups
   M.setup_highlights()
