@@ -1,0 +1,196 @@
+*nodejumper.txt*    Treesitter node jumping for Neovim
+
+==============================================================================
+CONTENTS                                              *nodejumper-contents*
+
+  1. Introduction ............................ |nodejumper-introduction|
+  2. Requirements ............................ |nodejumper-requirements|
+  3. Installation ............................ |nodejumper-installation|
+  4. Usage ................................... |nodejumper-usage|
+  5. Setup ................................... |nodejumper-setup|
+  6. Configuration ........................... |nodejumper-configuration|
+  7. Commands ................................ |nodejumper-commands|
+  8. API ..................................... |nodejumper-api|
+  9. Highlights .............................. |nodejumper-highlights|
+  10. License ................................ |nodejumper-license|
+
+==============================================================================
+INTRODUCTION                                      *nodejumper-introduction*
+
+nodejumper.nvim is a flash.nvim-like Neovim plugin for jumping to treesitter
+nodes. Press a key, see labels appear on all visible treesitter nodes, type
+the label to jump to that location.
+
+Features:
+- Jump to any visible treesitter node with minimal keystrokes
+- Labels use home row keys for quick access
+- Works in normal, visual, and operator-pending modes
+- Configurable labels, keymaps, and appearance
+
+==============================================================================
+REQUIREMENTS                                      *nodejumper-requirements*
+
+- Neovim >= 0.8.0
+- Treesitter parser for your language (`:TSInstall <language>`)
+
+==============================================================================
+INSTALLATION                                      *nodejumper-installation*
+
+Using lazy.nvim:
+>lua
+    {
+      'nodejumper.nvim',
+      config = function()
+        require('nodejumper').setup()
+      end
+    }
+<
+
+Using packer.nvim:
+>lua
+    use {
+      'nodejumper.nvim',
+      config = function()
+        require('nodejumper').setup()
+      end
+    }
+<
+
+==============================================================================
+USAGE                                                    *nodejumper-usage*
+
+1. Press `S` (default) in normal, visual, or operator-pending mode
+2. Labels appear on all visible treesitter nodes
+3. Type the label character(s) to jump to that node
+4. Press `<Esc>` to cancel
+
+==============================================================================
+SETUP                                                    *nodejumper-setup*
+
+nodejumper.setup({opts})                             *nodejumper.setup()*
+    Setup function to initialize the plugin.
+
+    Parameters: ~
+        {opts} (table|nil) Configuration options
+
+    Usage: ~
+>lua
+        require('nodejumper').setup({
+          -- Configuration options here
+        })
+<
+
+==============================================================================
+CONFIGURATION                                    *nodejumper-configuration*
+
+Default configuration:
+>lua
+    {
+      -- Labels used for jumping (home row first for accessibility)
+      labels = "asdfghjklqwertyuiopzxcvbnm",
+
+      -- Highlight groups
+      highlight = {
+        label = "NodejumperLabel",  -- Jump target labels
+        dim = "NodejumperDim",      -- Dimmed background
+      },
+
+      -- Keymaps
+      keys = {
+        jump = "S",       -- Key to trigger jump
+        cancel = "<Esc>", -- Key to cancel
+      },
+
+      -- Treesitter options
+      treesitter = {
+        all_nodes = false,    -- Include all nodes (even tiny ones)
+        min_node_size = 3,    -- Minimum node size in characters
+      },
+
+      -- Label display options
+      label_opts = {
+        priority = 1000,  -- Extmark priority
+      },
+    }
+<
+
+                                                        *nodejumper-labels*
+labels ~
+    String of characters used for generating jump labels. Characters at
+    the beginning are used first (single-character labels), then combinations
+    are generated for additional targets. Default uses home row keys first.
+
+                                                     *nodejumper-highlight*
+highlight.label ~
+    Highlight group for jump target labels. Default: "NodejumperLabel"
+
+highlight.dim ~
+    Highlight group for dimmed background text. Default: "NodejumperDim"
+
+                                                          *nodejumper-keys*
+keys.jump ~
+    Key to trigger treesitter node jump. Default: "S"
+
+keys.cancel ~
+    Key to cancel an active jump session. Default: "<Esc>"
+
+                                                    *nodejumper-treesitter*
+treesitter.all_nodes ~
+    When true, includes all treesitter nodes regardless of size.
+    When false, filters out very small nodes. Default: false
+
+treesitter.min_node_size ~
+    Minimum node size in characters to show a label (when all_nodes is false).
+    Default: 3
+
+==============================================================================
+COMMANDS                                              *nodejumper-commands*
+
+:NodejumperJump                                          *:NodejumperJump*
+    Start a jump session. Shows labels on all visible treesitter nodes.
+
+:NodejumperCancel                                      *:NodejumperCancel*
+    Cancel an active jump session.
+
+==============================================================================
+API                                                        *nodejumper-api*
+
+nodejumper.jump()                                      *nodejumper.jump()*
+    Start a treesitter node jump session.
+
+nodejumper.cancel()                                  *nodejumper.cancel()*
+    Cancel any active jump session.
+
+nodejumper.is_active()                            *nodejumper.is_active()*
+    Check if a jump session is currently active.
+    Returns: boolean
+
+==============================================================================
+HIGHLIGHTS                                          *nodejumper-highlights*
+
+NodejumperLabel                                          *hl-NodejumperLabel*
+    Highlight group for jump target labels.
+    Default: white text on pink background, bold
+>lua
+    vim.api.nvim_set_hl(0, "NodejumperLabel", {
+      fg = "#ffffff",
+      bg = "#ff007c",
+      bold = true,
+    })
+<
+
+NodejumperDim                                              *hl-NodejumperDim*
+    Highlight group for dimmed background text during jump mode.
+    Default: gray text
+>lua
+    vim.api.nvim_set_hl(0, "NodejumperDim", {
+      fg = "#545c7e",
+    })
+<
+
+==============================================================================
+LICENSE                                                *nodejumper-license*
+
+MIT License
+
+vim:tw=78:ts=8:ft=help:norl:
