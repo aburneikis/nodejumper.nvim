@@ -20,10 +20,12 @@ A flash.nvim-like Neovim plugin for jumping to treesitter nodes. Press a key, se
 
 ```lua
 {
-  'burneikis/nodejumper.nvim',
-  config = function()
-    require('nodejumper').setup()
-  end
+  "burneikis/nodejumper.nvim",
+  event = "VeryLazy",
+  opts = {},
+  keys = {
+    { "S", mode = { "n", "x", "o" }, function() require("nodejumper").jump() end, desc = "Jump to treesitter node" },
+  },
 }
 ```
 
@@ -31,16 +33,17 @@ A flash.nvim-like Neovim plugin for jumping to treesitter nodes. Press a key, se
 
 ```lua
 use {
-  'burneikis/nodejumper.nvim',
+  "burneikis/nodejumper.nvim",
   config = function()
-    require('nodejumper').setup()
+    require("nodejumper").setup()
+    vim.keymap.set({ "n", "x", "o" }, "S", function() require("nodejumper").jump() end, { desc = "Jump to treesitter node" })
   end
 }
 ```
 
 ## Usage
 
-1. Press `S` (default) in normal, visual, or operator-pending mode
+1. Press your configured key (e.g., `S`) in normal, visual, or operator-pending mode
 2. Labels appear on all visible treesitter nodes
 3. Type the label character(s) to jump to that node
 4. Press `<Esc>` to cancel
@@ -52,48 +55,45 @@ use {
 
 ## Configuration
 
-### Simple Configuration (Recommended)
+### Configuration
+
+Pass options via the `opts` table in your lazy.nvim spec:
 
 ```lua
-require('nodejumper').setup({
-  -- Labels used for jumping (home row keys first)
-  labels = "asdfghjklqwertyuiopzxcvbnm",
+{
+  "burneikis/nodejumper.nvim",
+  event = "VeryLazy",
+  opts = {
+    -- Labels used for jumping (home row keys first)
+    labels = "asdfghjklqwertyuiopzxcvbnm",
 
-  -- Key to trigger jump mode
-  jump_key = "S",
+    -- Minimum node size to show labels (reduces clutter)
+    min_node_size = 3,
 
-  -- Minimum node size to show labels (reduces clutter)
-  min_node_size = 3,
+    -- Minimum spacing between labels on same line
+    min_spacing = 2,
 
-  -- Minimum spacing between labels on same line
-  min_spacing = 2,
+    -- Dim background text during jump mode
+    dim_background = true,
 
-  -- Dim background text during jump mode
-  dim_background = true,
+    -- Include all nodes (even tiny ones) - expert mode
+    all_nodes = false,
 
-  -- Include all nodes (even tiny ones) - expert mode
-  all_nodes = false,
-})
-```
-
-### Advanced Configuration
-
-For fine-tuning, you can use the `advanced` table:
-
-```lua
-require('nodejumper').setup({
-  -- ... basic options above ...
-
-  advanced = {
-    cancel_key = "<Esc>",
-    min_word_length = 0,
-    priority = 1000,
-    highlight = {
-      label = "NodejumperLabel",
-      dim = "NodejumperDim",
+    -- Advanced options (rarely need to change)
+    advanced = {
+      cancel_key = "<Esc>",
+      min_word_length = 0,
+      priority = 1000,
+      highlight = {
+        label = "NodejumperLabel",
+        dim = "NodejumperDim",
+      },
     },
   },
-})
+  keys = {
+    { "S", mode = { "n", "x", "o" }, function() require("nodejumper").jump() end, desc = "Jump to treesitter node" },
+  },
+}
 ```
 
 ## Highlight Groups

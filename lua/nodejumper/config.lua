@@ -4,12 +4,6 @@ M.defaults = {
   -- Labels used for jumping (home row keys first for accessibility)
   labels = "asdfghjklqwertyuiopzxcvbnm",
 
-  -- Key to trigger jump mode
-  jump_key = "S",
-
-  -- Whether to set the default keymap (set to false for custom mappings)
-  set_default_keymap = true,
-
   -- Minimum node size to show labels (reduces clutter)
   min_node_size = 3,
 
@@ -54,11 +48,6 @@ local function validate_config(options)
   -- Validate min_spacing
   if type(options.min_spacing) ~= "number" or options.min_spacing < 0 then
     return false, "min_spacing must be a non-negative number"
-  end
-
-  -- Validate jump_key
-  if type(options.jump_key) ~= "string" or #options.jump_key == 0 then
-    return false, "jump_key must be a non-empty string"
   end
 
   -- Validate advanced.priority

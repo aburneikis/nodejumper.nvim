@@ -39,19 +39,22 @@ INSTALLATION                                      *nodejumper-installation*
 Using lazy.nvim:
 >lua
     {
-      'burneikis/nodejumper.nvim',
-      config = function()
-        require('nodejumper').setup()
-      end
+      "burneikis/nodejumper.nvim",
+      event = "VeryLazy",
+      opts = {},
+      keys = {
+        { "S", mode = { "n", "x", "o" }, function() require("nodejumper").jump() end, desc = "Jump to treesitter node" },
+      },
     }
 <
 
 Using packer.nvim:
 >lua
     use {
-      'burneikis/nodejumper.nvim',
+      "burneikis/nodejumper.nvim",
       config = function()
-        require('nodejumper').setup()
+        require("nodejumper").setup()
+        vim.keymap.set({ "n", "x", "o" }, "S", function() require("nodejumper").jump() end, { desc = "Jump to treesitter node" })
       end
     }
 <
@@ -59,7 +62,7 @@ Using packer.nvim:
 ==============================================================================
 USAGE                                                    *nodejumper-usage*
 
-1. Press `S` (default) in normal, visual, or operator-pending mode
+1. Press your configured key (e.g., `S`) in normal, visual, or operator-pending mode
 2. Labels appear on all visible treesitter nodes
 3. Type the label character(s) to jump to that node
 4. Press `<Esc>` to cancel
@@ -83,39 +86,40 @@ nodejumper.setup({opts})                             *nodejumper.setup()*
 ==============================================================================
 CONFIGURATION                                    *nodejumper-configuration*
 
-Default configuration:
+Pass options via the `opts` table in your lazy.nvim spec:
 >lua
     {
-      -- Labels used for jumping (home row first for accessibility)
-      labels = "asdfghjklqwertyuiopzxcvbnm",
+      "burneikis/nodejumper.nvim",
+      event = "VeryLazy",
+      opts = {
+        -- Labels used for jumping (home row first for accessibility)
+        labels = "asdfghjklqwertyuiopzxcvbnm",
 
-      -- Key to trigger jump mode
-      jump_key = "S",
+        -- Minimum node size to show labels (reduces clutter)
+        min_node_size = 3,
 
-      -- Whether to set the default keymap (set to false for custom mappings)
-      set_default_keymap = true,
+        -- Minimum spacing between labels on same line
+        min_spacing = 2,
 
-      -- Minimum node size to show labels (reduces clutter)
-      min_node_size = 3,
+        -- Dim background text during jump mode
+        dim_background = true,
 
-      -- Minimum spacing between labels on same line
-      min_spacing = 2,
+        -- Include all nodes (even tiny ones) - expert mode
+        all_nodes = false,
 
-      -- Dim background text during jump mode
-      dim_background = true,
-
-      -- Include all nodes (even tiny ones) - expert mode
-      all_nodes = false,
-
-      -- Advanced options (rarely need to change)
-      advanced = {
-        cancel_key = "<Esc>",
-        min_word_length = 0,
-        priority = 1000,
-        highlight = {
-          label = "NodejumperLabel",
-          dim = "NodejumperDim",
+        -- Advanced options (rarely need to change)
+        advanced = {
+          cancel_key = "<Esc>",
+          min_word_length = 0,
+          priority = 1000,
+          highlight = {
+            label = "NodejumperLabel",
+            dim = "NodejumperDim",
+          },
         },
+      },
+      keys = {
+        { "S", mode = { "n", "x", "o" }, function() require("nodejumper").jump() end, desc = "Jump to treesitter node" },
       },
     }
 <
@@ -125,15 +129,6 @@ labels ~
     String of characters used for generating jump labels. Characters at
     the beginning are used first (single-character labels), then combinations
     are generated for additional targets. Default uses home row keys first.
-
-                                                      *nodejumper-jump_key*
-jump_key ~
-    Key to trigger treesitter node jump. Default: "S"
-
-                                             *nodejumper-set_default_keymap*
-set_default_keymap ~
-    Whether to set the default keymap. Set to false if you want to define
-    your own keymap. Default: true
 
                                                  *nodejumper-min_node_size*
 min_node_size ~
