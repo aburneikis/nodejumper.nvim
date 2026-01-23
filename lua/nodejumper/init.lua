@@ -15,6 +15,11 @@ end
 function M.setup_keymaps()
   local opts = config.options
 
+  -- Skip if user disabled default keymap
+  if not opts.set_default_keymap then
+    return
+  end
+
   -- Set up the jump keymap
   vim.keymap.set({ "n", "x", "o" }, opts.jump_key, function()
     M.jump()

@@ -7,6 +7,9 @@ M.defaults = {
   -- Key to trigger jump mode
   jump_key = "S",
 
+  -- Whether to set the default keymap (set to false for custom mappings)
+  set_default_keymap = true,
+
   -- Minimum node size to show labels (reduces clutter)
   min_node_size = 3,
 
@@ -31,16 +34,16 @@ M.defaults = {
   },
 }
 
-M.options = M.defaults
+M.options = vim.deepcopy(M.defaults)
 
-M.setup = function(opts)
+function M.setup(opts)
   M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
 
   -- Set up default highlight groups
   M.setup_highlights()
 end
 
-M.setup_highlights = function()
+function M.setup_highlights()
   local opts = M.options
 
   -- Label highlight - bright and visible (default = true allows user overrides)

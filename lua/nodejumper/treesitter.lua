@@ -22,14 +22,32 @@ end
 
 --- Calculate node size in characters
 ---@param node TSNode
+---@param bufnr number Buffer number
 ---@return number
-local function get_node_size(node)
+local function get_node_size(node, bufnr)
   local start_row, start_col, end_row, end_col = node:range()
   if start_row == end_row then
     return end_col - start_col
   end
-  -- For multi-line nodes, use a rough estimate
-  return (end_row - start_row) * 80 + (end_col - start_col)
+  -- For multi-line nodes, calculate actual size using line lengths
+  local lines = vim.api.nvim_buf_get_lines(bufnr, start_row, end_row + 1, false)
+  if #lines == 0 then
+    return 0
+  end
+  local size = 0
+  for i, line in ipairs(lines) do
+    if i == 1 then
+      -- First line: from start_col to end of line
+      size = size + (#line - start_col)
+    elseif i == #lines then
+      -- Last line: from start to end_col
+      size = size + end_col
+    else
+      -- Middle lines: full line length
+      size = size + #line
+    end
+  end
+  return size
 end
 
 --- Get the length of the word at a specific position in the buffer
@@ -92,7 +110,7 @@ function M.get_visible_nodes(bufnr)
 
       -- Check node size if filtering is enabled
       local include_node = true
-      local node_size = get_node_size(node)
+      local node_size = get_node_size(node, bufnr)
       if not opts.all_nodes then
         if node_size < opts.min_node_size then
           include_node = false
@@ -100,7 +118,7 @@ function M.get_visible_nodes(bufnr)
       end
 
       -- Check word length at the label position
-      if include_node and opts.advanced.min_word_length then
+      if include_node and opts.advanced.min_word_length > 0 then
         local word_length = get_word_length_at_position(bufnr, start_row, start_col)
         if word_length < opts.advanced.min_word_length then
           include_node = false
