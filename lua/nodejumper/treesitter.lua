@@ -92,12 +92,6 @@ function M.get_visible_nodes(bufnr)
   local seen_positions = {}
   local nodes = {}
 
-  -- Parse the tree
-  local trees = parser:parse()
-  if not trees or #trees == 0 then
-    return {}
-  end
-
   --- Recursively collect nodes from a TSNode
   ---@param node TSNode
   local function collect_nodes(node)
@@ -144,11 +138,11 @@ function M.get_visible_nodes(bufnr)
     end
   end
 
-  -- Process all trees (there can be multiple for injected languages)
-  for _, tree in ipairs(trees) do
+  -- Process all trees including injected languages (e.g., HTML in Angular templates)
+  parser:for_each_tree(function(tree, _lang_tree)
     local root = tree:root()
     collect_nodes(root)
-  end
+  end)
 
   -- Sort by position (top to bottom, left to right)
   table.sort(nodes, function(a, b)
